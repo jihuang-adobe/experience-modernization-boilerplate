@@ -1,6 +1,8 @@
+/* Columns block – RWJBH layout */
 .columns > div {
   display: flex;
   flex-direction: column;
+  gap: 24px;
 }
 
 .columns img {
@@ -19,11 +21,51 @@
   display: block;
 }
 
+.columns h2 {
+  font-family: var(--heading-font-family);
+  color: var(--heading-color);
+  font-size: var(--heading-font-size-l);
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+
+.columns h2 em {
+  font-weight: 400;
+  font-style: normal;
+}
+
+.columns h3 {
+  font-family: var(--heading-font-family);
+  color: var(--heading-color);
+  font-size: var(--heading-font-size-m);
+  font-weight: 600;
+  margin: 0 0 16px;
+}
+
+.columns h4 {
+  color: var(--heading-color);
+}
+
+.columns p {
+  color: var(--text-color-muted);
+  line-height: 1.7;
+  margin: 0 0 16px;
+}
+
+.columns a {
+  color: var(--link-color);
+  font-weight: 600;
+}
+
+.columns a:hover {
+  color: var(--link-hover-color);
+}
+
 @media (width >= 900px) {
   .columns > div {
-    align-items: center;
+    align-items: flex-start;
     flex-direction: unset;
-    gap: 24px;
+    gap: 40px;
   }
 
   .columns > div > div {
