@@ -1,34 +1,35 @@
 {
   "templates": [
     {
-      "name": "rwjbh-homepage",
-      "urls": ["https://www.rwjbh.org/"],
-      "description": "RWJBarnabas Health homepage with hero banner, welcome content, health equity announcement, awards carousel, locations CTA, find a doctor, specialty services cards, and news/events",
+      "name": "wknd-landing-page",
+      "urls": [
+        "https://wknd.site/us/en.html"
+      ],
+      "description": "WKND homepage landing page with hero carousel, featured article, article cards, hero teaser, and adventure cards sections",
       "blocks": [
         {
-          "name": "hero",
-          "instances": ["section.banner-area#BannerAreaHome2023"]
+          "name": "carousel",
+          "instances": [
+            ".cmp-carousel--hero"
+          ]
         },
         {
           "name": "columns",
           "instances": [
-            "section.content-area#ContentAreaHome",
-            "section.content-area.ancm-sc#AnnouncementSection > div",
-            "section.find-doctor-container#FindADoctorHome2023 .find-doctor-box",
-            "section.news-event-container#NewsEventContainer2023"
+            ".cmp-teaser--featured"
           ]
         },
         {
-          "name": "carousel",
-          "instances": ["section.award-container#AwardContainer2023"]
-        },
-        {
-          "name": "hero-locations",
-          "instances": ["section.lct-cta#LocationCta"]
-        },
-        {
           "name": "cards",
-          "instances": ["section.specialty-services-container#TwoRowSpecialtyServices2023"]
+          "instances": [
+            ".cmp-image-list"
+          ]
+        },
+        {
+          "name": "hero",
+          "instances": [
+            ".cmp-teaser--hero.cmp-teaser--imagebottom"
+          ]
         }
       ]
     }

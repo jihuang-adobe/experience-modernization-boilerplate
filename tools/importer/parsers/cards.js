@@ -4,92 +4,80 @@
 /**
  * Parser for cards block
  *
- * Source: https://www.rwjbh.org/
+ * Source: https://wknd.site/us/en.html
  * Base Block: cards
  *
- * Block Structure (from Block Collection example):
- * - Row N: [image, content (title + description + link)]
+ * Block Structure:
+ * - Each row: [image, text content (title link + description)]
  *
- * Source HTML Pattern (from captured DOM at line 931):
- * <section class="specialty-services-container fll-mbl" id="TwoRowSpecialtyServices2023">
- *   <div class="service-header">...</div>
- *   <ul class="specialties-box new ui-repeater" id="TwoRowSpecialtiesV2">
- *     <li class="specialty item-N third relative v1">
- *       <a href="...">
- *         <div class="specialty-info">
- *           <h4>Title</h4>
- *           <p>Description</p>
- *         </div>
- *         <div class="specialty-image-area relative">
- *           <picture><img src="..."></picture>
- *         </div>
+ * Source HTML Pattern:
+ * <ul class="cmp-image-list">
+ *   <li class="cmp-image-list__item">
+ *     <article class="cmp-image-list__item-content">
+ *       <a class="cmp-image-list__item-image-link" href="...">
+ *         <div class="cmp-image-list__item-image"><img .../></div>
  *       </a>
- *     </li>
- *   </ul>
- * </section>
+ *       <a class="cmp-image-list__item-title-link" href="...">
+ *         <span class="cmp-image-list__item-title">Title</span>
+ *       </a>
+ *       <span class="cmp-image-list__item-description">Description</span>
+ *     </article>
+ *   </li>
+ * </ul>
  *
- * Generated: 2026-02-13
+ * Generated: 2026-02-25
  */
 export default function parse(element, { document }) {
   const cells = [];
 
-  // Extract each specialty service card
-  // VALIDATED: Found <ul class="specialties-box"> with <li class="specialty"> children at lines 941-1038
-  const cardItems = element.querySelectorAll('.specialties-box > li.specialty') ||
-                    element.querySelectorAll('ul > li');
+  // Each card is a .cmp-image-list__item
+  // VALIDATED: Found .cmp-image-list__item elements in captured DOM
+  const items = element.querySelectorAll('.cmp-image-list__item');
 
-  if (cardItems.length > 0) {
-    cardItems.forEach((item) => {
-      // Extract card link
-      // VALIDATED: Found <a href="/treatment-care/..."> wrapping card content
-      const link = item.querySelector('a');
+  items.forEach((item) => {
+    // Extract image
+    // VALIDATED: Found .cmp-image-list__item-image img in captured DOM
+    const img = item.querySelector('.cmp-image-list__item-image img')
+      || item.querySelector('img');
 
-      // Extract image from specialty-image-area
-      // VALIDATED: Found <div class="specialty-image-area"><picture><img></picture></div>
-      const img = item.querySelector('.specialty-image-area img') ||
-                  item.querySelector('picture img') ||
-                  item.querySelector('img:not([src^="data:"])');
+    // Extract title link
+    // VALIDATED: Found .cmp-image-list__item-title-link with nested .cmp-image-list__item-title
+    const titleLink = item.querySelector('.cmp-image-list__item-title-link');
+    const titleText = item.querySelector('.cmp-image-list__item-title');
 
-      // Extract title from specialty-info (use first h4 to avoid duplicate from image area)
-      // VALIDATED: Found <div class="specialty-info"><h4>Cancer Services</h4>
-      const title = item.querySelector('.specialty-info h4') ||
-                    item.querySelector('.specialty-info h3') ||
-                    item.querySelector('h4');
+    // Extract description
+    // VALIDATED: Found .cmp-image-list__item-description in captured DOM
+    const description = item.querySelector('.cmp-image-list__item-description');
 
-      // Extract description
-      // VALIDATED: Found <p>description text</p> inside .specialty-info
-      const desc = item.querySelector('.specialty-info p') ||
-                   item.querySelector('p');
+    // Build text content cell
+    const textCell = document.createElement('div');
 
-      // Build image cell
-      const imageCell = document.createElement('div');
-      if (img) {
-        imageCell.appendChild(img.cloneNode(true));
-      }
+    if (titleLink && titleText) {
+      // Create bold linked title
+      const strong = document.createElement('strong');
+      const link = document.createElement('a');
+      link.href = titleLink.href;
+      link.textContent = titleText.textContent;
+      strong.append(link);
+      textCell.append(strong);
+    } else if (titleText) {
+      const strong = document.createElement('strong');
+      strong.textContent = titleText.textContent;
+      textCell.append(strong);
+    }
 
-      // Build content cell
-      const contentCell = document.createElement('div');
-      if (title) {
-        const h = document.createElement('h3');
-        h.textContent = title.textContent.trim();
-        if (link && link.href) {
-          const a = document.createElement('a');
-          a.href = link.href || link.getAttribute('href');
-          a.textContent = title.textContent.trim();
-          h.textContent = '';
-          h.appendChild(a);
-        }
-        contentCell.appendChild(h);
-      }
-      if (desc) {
-        const p = document.createElement('p');
-        p.textContent = desc.textContent.trim();
-        contentCell.appendChild(p);
-      }
+    if (description) {
+      const descText = document.createTextNode(' ' + description.textContent);
+      textCell.append(descText);
+    }
 
-      cells.push([imageCell, contentCell]);
-    });
-  }
+    // Row: [image, text content]
+    if (img) {
+      cells.push([img.cloneNode(true), textCell]);
+    } else {
+      cells.push([textCell]);
+    }
+  });
 
   const block = WebImporter.Blocks.createBlock(document, { name: 'Cards', cells });
   element.replaceWith(block);

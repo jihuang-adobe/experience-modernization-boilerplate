@@ -1,22 +1,23 @@
-/* Cards block – RWJBH specialty services design */
+/* Cards block – WKND article cards */
 .cards > ul {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 0;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 24px;
 }
 
 .cards > ul > li {
   position: relative;
   overflow: hidden;
-  background-color: var(--dark-color);
+  background-color: var(--background-color);
   border: none;
 }
 
 .cards .cards-card-image {
   line-height: 0;
+  overflow: hidden;
 }
 
 .cards > ul > li img {
@@ -32,34 +33,40 @@
 }
 
 .cards .cards-card-body {
-  padding: 16px 20px;
-  background-color: var(--dark-color);
+  padding: 12px 0;
+  background-color: transparent;
 }
 
-.cards .cards-card-body p {
-  margin: 0;
-  color: #fff;
-  font-size: var(--body-font-size-s);
-  line-height: 1.5;
+/* Card title */
+.cards .cards-card-title {
+  margin: 0 0 4px;
 }
 
-.cards .cards-card-body p strong {
-  display: block;
-  font-family: var(--heading-font-family);
-  font-size: var(--heading-font-size-m);
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 8px;
-}
-
-.cards .cards-card-body a {
-  color: #fff;
-  text-decoration: underline;
+.cards .cards-card-title a {
+  color: var(--text-color);
+  text-decoration: none;
+  font-family: var(--body-font-family);
+  font-size: var(--body-font-size-m);
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.cards .cards-card-body a:hover {
-  color: var(--light-color);
+.cards .cards-card-title a:hover {
+  text-decoration: underline;
+}
+
+/* Card description */
+.cards .cards-card-description {
+  margin: 0;
+  color: var(--text-color);
+  font-size: var(--body-font-size-xs);
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media (width >= 600px) {
@@ -70,6 +77,6 @@
 
 @media (width >= 900px) {
   .cards > ul {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 }

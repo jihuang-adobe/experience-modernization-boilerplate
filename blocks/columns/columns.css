@@ -1,16 +1,18 @@
-/* Columns block – RWJBH layout */
+/* Columns block – WKND featured article layout */
 .columns > div {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 0;
 }
 
 .columns img {
   width: 100%;
+  display: block;
 }
 
 .columns > div > div {
   order: 1;
+  padding: 24px;
 }
 
 .columns > div > .columns-img-col {
@@ -19,57 +21,86 @@
 
 .columns > div > .columns-img-col img {
   display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Pretitle – "Featured Article" label */
+.columns .columns-pretitle {
+  font-family: var(--body-font-family);
+  font-size: var(--body-font-size-xs);
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-color);
+  margin: 0 0 8px;
 }
 
 .columns h2 {
   font-family: var(--heading-font-family);
   color: var(--heading-color);
   font-size: var(--heading-font-size-l);
-  font-weight: 700;
-  margin: 0 0 16px;
-}
-
-.columns h2 em {
   font-weight: 400;
-  font-style: normal;
+  margin: 0 0 16px;
+  line-height: 1.4;
 }
 
 .columns h3 {
   font-family: var(--heading-font-family);
   color: var(--heading-color);
   font-size: var(--heading-font-size-m);
-  font-weight: 600;
+  font-weight: 400;
   margin: 0 0 16px;
-}
-
-.columns h4 {
-  color: var(--heading-color);
 }
 
 .columns p {
-  color: var(--text-color-muted);
-  line-height: 1.7;
+  color: var(--text-color);
+  line-height: 1.75;
   margin: 0 0 16px;
+  font-size: var(--body-font-size-m);
 }
 
-.columns a {
-  color: var(--link-color);
+/* CTA button */
+.columns .columns-cta {
+  margin: 8px 0 0;
+}
+
+.columns .columns-cta a {
+  display: inline-block;
+  padding: 14px 35px;
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: var(--body-font-size-xs);
   font-weight: 600;
+  letter-spacing: 0.05em;
+  transition: background-color 0.3s ease;
 }
 
-.columns a:hover {
-  color: var(--link-hover-color);
+.columns .columns-cta a:hover {
+  background-color: var(--accent-hover-color);
+  text-decoration: none;
 }
 
 @media (width >= 900px) {
   .columns > div {
-    align-items: flex-start;
-    flex-direction: unset;
-    gap: 40px;
+    align-items: stretch;
+    flex-direction: row;
+    gap: 0;
   }
 
   .columns > div > div {
     flex: 1;
     order: unset;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 32px 40px;
+  }
+
+  .columns > div > .columns-img-col {
+    flex: 1;
   }
 }

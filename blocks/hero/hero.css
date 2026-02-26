@@ -1,8 +1,8 @@
-/* Hero block – RWJBH design */
+/* Hero block – WKND teaser style (image top, text below) */
 
-/* Section-level overrides */
+/* Full-width container */
 .hero-container {
-  margin-bottom: 0;
+  margin: 0;
 }
 
 .hero-container .hero-wrapper {
@@ -10,82 +10,22 @@
   padding: 0;
 }
 
-/* CTA bar below hero (default content in hero section) */
-.hero-container > .default-content-wrapper {
-  max-width: unset;
-  margin: 0;
-  padding: 0;
-  background-color: var(--accent-color);
-}
-
-.hero-container > .default-content-wrapper p {
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-  margin: 0;
-  padding: 0;
-  flex-wrap: wrap;
-  font-size: 0;
-  line-height: 0;
-  color: transparent;
-}
-
-.hero-container > .default-content-wrapper p strong {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-right: 1px solid rgb(255 255 255 / 20%);
-}
-
-.hero-container > .default-content-wrapper p strong:last-child {
-  border-right: none;
-}
-
-.hero-container > .default-content-wrapper p a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px 16px;
-  color: #fff;
-  font-family: var(--heading-font-family);
-  font-size: var(--body-font-size-s);
-  font-weight: 600;
-  text-decoration: none;
-  white-space: nowrap;
-  width: 100%;
-}
-
-.hero-container > .default-content-wrapper p a:hover {
-  background-color: var(--accent-hover-color);
-}
-
-/* Hero block */
+/* Hero block layout – stacked vertically */
 .hero {
   position: relative;
   width: 100%;
-  height: clamp(320px, 50vw, 70vh);
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Background image – first row */
+/* Image row (first child) */
 .hero > div:first-child {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
+  width: 100%;
+  min-height: 300px;
+  overflow: hidden;
+  line-height: 0;
 }
 
-/* Content overlay – absolutely positioned at bottom */
-.hero > div:last-child {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 1;
-  padding: 24px;
-}
-
-.hero > div:first-child > div,
 .hero picture {
   display: block;
   width: 100%;
@@ -96,47 +36,66 @@
   object-fit: cover;
   width: 100%;
   height: 100%;
+  min-height: 300px;
   display: block;
 }
 
-.hero h1 {
+/* Text content row (second child) */
+.hero > div:last-child {
+  padding: 24px;
+  background: var(--background-color);
+}
+
+.hero h2 {
   font-family: var(--heading-font-family);
   color: var(--heading-color);
-  font-size: 24px;
+  font-size: var(--heading-font-size-xl);
   font-weight: 400;
-  line-height: 1.1;
-  max-width: 600px;
-  margin: 0;
+  line-height: 1.4;
+  margin: 0 0 12px;
 }
 
-.hero h1 .hero-text-bold {
-  display: block;
-  font-weight: 700;
-  font-size: 1.35em;
-  line-height: 1.05;
+.hero p {
+  color: var(--text-color);
+  font-size: var(--body-font-size-m);
+  line-height: 1.75;
+  margin: 0 0 16px;
 }
 
-@media (width >= 600px) {
-  .hero h1 {
-    font-size: 30px;
-  }
+/* CTA button */
+.hero .hero-cta {
+  margin: 8px 0 0;
+}
+
+.hero .hero-cta a {
+  display: inline-block;
+  padding: 14px 35px;
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: var(--body-font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  transition: background-color 0.3s ease;
+}
+
+.hero .hero-cta a:hover {
+  background-color: var(--accent-hover-color);
+  text-decoration: none;
 }
 
 @media (width >= 900px) {
+  .hero > div:first-child {
+    height: clamp(300px, 50vw, 600px);
+  }
+
+  .hero img {
+    min-height: unset;
+    height: 100%;
+  }
+
   .hero > div:last-child {
-    padding: 32px 48px;
-  }
-
-  .hero h1 {
-    font-size: 40px;
-  }
-
-  .hero h1 .hero-text-bold {
-    font-size: 54px;
-  }
-
-  .hero-container > .default-content-wrapper p a {
-    padding: 24px 20px;
-    font-size: 17px;
+    padding: 32px 40px;
   }
 }

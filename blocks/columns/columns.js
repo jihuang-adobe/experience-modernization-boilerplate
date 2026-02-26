@@ -1,108 +1,63 @@
-/* eslint-disable no-param-reassign */
-
 /**
- * Convert a paragraph starting with markdown heading syntax into
- * a proper heading element, splitting body content that follows
- * the heading phrase into a sibling wrapper.
+ * Restructure a text column whose content is a single <p> containing
+ * <em> (pretitle) + <strong> (title) + text (description) + <strong><a> (CTA).
+ * Splits them into separate elements so CSS can style each independently.
  */
-function convertHeadingParagraph(p) {
-  const first = p.firstChild;
-  if (!first || first.nodeType !== Node.TEXT_NODE) return;
-  const match = first.textContent.match(/^(#{1,6})\s+/);
-  if (!match) return;
+function restructureColumnContent(col) {
+  const p = col.querySelector('p');
+  if (!p) return;
 
-  const level = match[1].length;
-  first.textContent = first.textContent.replace(/^#{1,6}\s+/, '');
+  const em = p.querySelector(':scope > em');
+  const strongs = [...p.querySelectorAll(':scope > strong')];
 
-  const heading = document.createElement(`h${level}`);
-  const body = document.createElement('div');
-  let inBody = false;
+  const titleStrong = strongs.find((s) => !s.querySelector('a'));
+  const ctaStrong = strongs.find((s) => s.querySelector('a'));
 
-  // Words that commonly start body/sentence text after a heading phrase
-  const bodyRe = /^(.{10,60}?)\s+(With|Our|The|Search|Access|We|At|In|For|An|As|Each|All|This|That)\s/;
+  if (!titleStrong) return;
 
-  [...p.childNodes].forEach((node) => {
-    if (inBody) {
-      body.appendChild(node);
-      return;
+  // Collect description text nodes
+  const descParts = [];
+  p.childNodes.forEach((node) => {
+    if (node === em || node === titleStrong || node === ctaStrong) return;
+    if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+      descParts.push(node.textContent.trim());
     }
-
-    if (node.nodeType === Node.ELEMENT_NODE) {
-      if (node.tagName === 'A' || node.tagName === 'STRONG') {
-        inBody = true;
-        body.appendChild(node);
-        return;
-      }
-      heading.appendChild(node);
-      return;
-    }
-
-    // Long text nodes may contain heading text + body text
-    if (node.nodeType === Node.TEXT_NODE && node.textContent.length > 20) {
-      const bm = node.textContent.match(bodyRe);
-      if (bm) {
-        heading.appendChild(
-          document.createTextNode(bm[1].trimEnd()),
-        );
-        body.appendChild(
-          document.createTextNode(node.textContent.slice(bm[1].length)),
-        );
-        inBody = true;
-        return;
-      }
-    }
-
-    heading.appendChild(node);
   });
-
-  // Trim trailing whitespace from heading
-  const last = heading.lastChild;
-  if (last?.nodeType === Node.TEXT_NODE) {
-    last.textContent = last.textContent.trimEnd();
-  }
 
   const frag = document.createDocumentFragment();
+
+  if (em) {
+    const pretitle = document.createElement('p');
+    pretitle.className = 'columns-pretitle';
+    pretitle.textContent = em.textContent;
+    frag.appendChild(pretitle);
+  }
+
+  const heading = document.createElement('h2');
+  heading.textContent = titleStrong.textContent;
   frag.appendChild(heading);
-  if (body.childNodes.length) frag.appendChild(body);
+
+  if (descParts.length) {
+    const desc = document.createElement('p');
+    desc.textContent = descParts.join(' ');
+    frag.appendChild(desc);
+  }
+
+  if (ctaStrong) {
+    const ctaP = document.createElement('p');
+    ctaP.className = 'columns-cta';
+    ctaP.appendChild(ctaStrong.querySelector('a').cloneNode(true));
+    frag.appendChild(ctaP);
+  }
+
   p.replaceWith(frag);
-}
-
-/**
- * Handle inline ### headings that appear after an image in a paragraph.
- * Splits the paragraph and inserts a proper heading element.
- */
-function convertInlineHeadings(block) {
-  block.querySelectorAll('p').forEach((p) => {
-    [...p.childNodes].forEach((node) => {
-      if (node.nodeType !== Node.TEXT_NODE) return;
-      const m = node.textContent.match(/^\s*(#{2,6})\s+(.+)/);
-      if (!m) return;
-      const level = m[1].length;
-      const heading = document.createElement(`h${level}`);
-      heading.textContent = m[2].trim();
-      node.replaceWith(heading);
-    });
-
-    // If the <p> now contains block-level elements, unwrap them
-    if (p.querySelector('h2, h3, h4, h5, h6')) {
-      const frag = document.createDocumentFragment();
-      [...p.childNodes].forEach((child) => frag.appendChild(child));
-      p.replaceWith(frag);
-    }
-  });
 }
 
 export default function decorate(block) {
   const cols = [...block.firstElementChild.children];
   block.classList.add(`columns-${cols.length}-cols`);
 
-  // Pass 1: convert paragraphs that START with ## / ### headings
-  block.querySelectorAll('p').forEach((p) => convertHeadingParagraph(p));
-
-  // Pass 2: handle ### headings that appear mid-paragraph (after images)
-  convertInlineHeadings(block);
-
-  // Setup image columns
+  // Setup image columns and restructure text columns
   [...block.children].forEach((row) => {
     [...row.children].forEach((col) => {
       const pic = col.querySelector('picture');
@@ -111,6 +66,8 @@ export default function decorate(block) {
         if (picWrapper && picWrapper.children.length === 1) {
           picWrapper.classList.add('columns-img-col');
         }
+      } else {
+        restructureColumnContent(col);
       }
     });
   });

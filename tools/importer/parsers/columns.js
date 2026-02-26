@@ -2,86 +2,76 @@
 /* global WebImporter */
 
 /**
- * Parser for columns block
+ * Parser for columns block (featured teaser)
  *
- * Source: https://www.rwjbh.org/
+ * Source: https://wknd.site/us/en.html
  * Base Block: columns
  *
- * Block Structure (from Block Collection example):
- * - Row N: One cell per column [content1, content2, ...]
+ * Block Structure:
+ * - Row 1: [image, text content (pretitle + heading + description + CTA)]
  *
- * Handles 4 different column layouts on the homepage:
- * 1. ContentAreaHome (line 493): 2/3 article + 1/3 sidebar
- * 2. AnnouncementSection (line 578): 1/3 text + 2/3 image content
- * 3. FindADoctorHome2023 (line 819): 3-column with images and CTA
- * 4. NewsEventContainer2023 (line 1040): News (1/3) + Events (2/3)
+ * Source HTML Pattern:
+ * <div class="teaser cmp-teaser--featured">
+ *   <div class="cmp-teaser">
+ *     <div class="cmp-teaser__content">
+ *       <p class="cmp-teaser__pretitle">Featured Article</p>
+ *       <h2 class="cmp-teaser__title">...</h2>
+ *       <div class="cmp-teaser__description">...</div>
+ *       <a class="cmp-teaser__action-link">...</a>
+ *     </div>
+ *     <div class="cmp-teaser__image"><img .../></div>
+ *   </div>
+ * </div>
  *
- * Generated: 2026-02-13
+ * Generated: 2026-02-25
  */
 export default function parse(element, { document }) {
+  // Extract image
+  // VALIDATED: Found .cmp-teaser__image img in captured DOM (#featured-teaser-home)
+  const img = element.querySelector('.cmp-teaser__image img')
+    || element.querySelector('img');
+
+  // Extract pretitle
+  // VALIDATED: Found .cmp-teaser__pretitle in captured DOM
+  const pretitle = element.querySelector('.cmp-teaser__pretitle')
+    || element.querySelector('p.pretitle');
+
+  // Extract heading
+  // VALIDATED: Found .cmp-teaser__title (h2) in captured DOM
+  const heading = element.querySelector('.cmp-teaser__title')
+    || element.querySelector('h2, h1, h3');
+
+  // Extract description
+  // VALIDATED: Found .cmp-teaser__description in captured DOM
+  const description = element.querySelector('.cmp-teaser__description')
+    || element.querySelector('[class*="description"]');
+
+  // Extract CTA link
+  // VALIDATED: Found .cmp-teaser__action-link in captured DOM
+  const cta = element.querySelector('.cmp-teaser__action-link')
+    || element.querySelector('a[href]');
+
+  // Build text content cell with pretitle, heading, description, and CTA
+  const textCell = document.createElement('div');
+  if (pretitle) {
+    const em = document.createElement('em');
+    em.textContent = pretitle.textContent;
+    textCell.append(em);
+  }
+  if (heading) textCell.append(heading.cloneNode(true));
+  if (description) textCell.append(description.cloneNode(true));
+  if (cta) {
+    const strong = document.createElement('strong');
+    strong.append(cta.cloneNode(true));
+    textCell.append(strong);
+  }
+
+  // Row: [image, text content]
   const cells = [];
-
-  // Strategy: Detect column children based on common layout patterns
-  // Look for direct children that represent visual columns
-
-  // Pattern 1: article + aside (ContentAreaHome)
-  const article = element.querySelector('article');
-  const aside = element.querySelector('aside');
-  if (article && aside) {
-    cells.push([article.cloneNode(true), aside.cloneNode(true)]);
-    const block = WebImporter.Blocks.createBlock(document, { name: 'Columns', cells });
-    element.replaceWith(block);
-    return;
-  }
-
-  // Pattern 2: Direct div children with column classes (third, two-thirds, etc.)
-  const columnChildren = element.querySelectorAll(':scope > div, :scope > .third, :scope > .two-thirds');
-  if (columnChildren.length >= 2) {
-    const row = [];
-    columnChildren.forEach((col) => {
-      row.push(col.cloneNode(true));
-    });
-    cells.push(row);
-    const block = WebImporter.Blocks.createBlock(document, { name: 'Columns', cells });
-    element.replaceWith(block);
-    return;
-  }
-
-  // Pattern 3: News/Events container with named boxes
-  const newsBox = element.querySelector('.news-box');
-  const eventsBox = element.querySelector('.events-box');
-  if (newsBox && eventsBox) {
-    cells.push([newsBox.cloneNode(true), eventsBox.cloneNode(true)]);
-    const block = WebImporter.Blocks.createBlock(document, { name: 'Columns', cells });
-    element.replaceWith(block);
-    return;
-  }
-
-  // Pattern 4: Find a Doctor - image containers + search
-  const leftImg = element.querySelector('.image-container-left, .find-left');
-  const searchBox = element.querySelector('.doctor-search-container, .physician-search');
-  const rightImg = element.querySelector('.image-container-right, .find-right');
-  if (searchBox) {
-    const row = [];
-    if (leftImg) row.push(leftImg.cloneNode(true));
-    row.push(searchBox.cloneNode(true));
-    if (rightImg) row.push(rightImg.cloneNode(true));
-    cells.push(row);
-    const block = WebImporter.Blocks.createBlock(document, { name: 'Columns', cells });
-    element.replaceWith(block);
-    return;
-  }
-
-  // Fallback: Treat all direct children as columns
-  const children = element.children;
-  if (children.length >= 2) {
-    const row = [];
-    for (let i = 0; i < children.length; i++) {
-      row.push(children[i].cloneNode(true));
-    }
-    cells.push(row);
-  } else if (children.length === 1) {
-    cells.push([element.cloneNode(true)]);
+  if (img) {
+    cells.push([img.cloneNode(true), textCell]);
+  } else {
+    cells.push([textCell]);
   }
 
   const block = WebImporter.Blocks.createBlock(document, { name: 'Columns', cells });

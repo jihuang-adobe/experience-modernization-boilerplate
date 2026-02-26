@@ -1,0 +1,5 @@
+/* Metadata block – hidden, used only for page metadata */
+.metadata-container,
+.metadata {
+  display: none !important;
+}
